@@ -13,6 +13,8 @@ class Artstock extends Admin_Controller
 		$this->data['page_title'] = 'Artstock';
 
 		$this->load->model('model_artstock');
+		$this->load->model('Model_stock');
+		$this->load->model('Model_emplacement');
 	}
 
 	/* 
@@ -24,7 +26,29 @@ class Artstock extends Admin_Controller
 			redirect('dashboard', 'refresh');
 		}
 
+		// Load stock articles and emplacements for dropdowns
+		$this->data['stock_articles'] = $this->Model_stock->getStockData();
+		$this->data['emplacements'] = $this->Model_emplacement->getEmplacementData();
+
 		$this->render_template('artstock/index', $this->data);	
+	}
+
+	/*
+	* Fetch stock articles for dropdown
+	*/
+	public function fetchStockArticles()
+	{
+		$articles = $this->Model_stock->getStockData();
+		echo json_encode($articles);
+	}
+
+	/*
+	* Fetch emplacements for dropdown
+	*/
+	public function fetchEmplacements()
+	{
+		$emplacements = $this->Model_emplacement->getEmplacementData();
+		echo json_encode($emplacements);
 	}
 
 	/*
@@ -64,10 +88,10 @@ class Artstock extends Admin_Controller
 			}
 
 			$result['data'][$key] = array(
-				$value['code_article'],
+				$value['code_article'] . (isset($value['article_name']) ? ' (' . $value['article_name'] . ')' : ''),
 				$value['desc'],
 				$value['qte'],
-                $value['emp'],
+                $value['emp'] . (isset($value['emplacement_name']) ? ' (' . $value['emplacement_name'] . ')' : ''),
 				$buttons
 			);
 		} // /foreach
@@ -91,13 +115,50 @@ class Artstock extends Admin_Controller
 
         $this->form_validation->set_rules('add_codeart', 'code art', 'trim|required'); // Update field name
         $this->form_validation->set_rules('add_desc', 'description', 'trim|required'); // Update field name
-        $this->form_validation->set_rules('add_qte', 'qte', 'trim|required'); // Update field name
+        $this->form_validation->set_rules('add_qte', 'qte', 'trim|required|numeric'); // Update field name
+        $this->form_validation->set_rules('add_emp', 'emplacement', 'trim|required'); // Update field name
 
         $this->form_validation->set_error_delimiters('<p class="text-danger">', '</p>');
         /*$this->load->model('Emplacement_model');*/
         /*$leastOccupiedEmp = $this->Emplacement_model->getLeastOccupiedEmp();*/
 
         if ($this->form_validation->run() == TRUE) {
+            // Validate that article code exists in stock table
+            $this->load->model('Model_stock');
+            $article = $this->Model_stock->getStockData();
+            $article_exists = false;
+            foreach ($article as $art) {
+                if ($art['codeart'] == $this->input->post('add_codeart')) {
+                    $article_exists = true;
+                    break;
+                }
+            }
+            
+            // Validate that emplacement code exists
+            $this->load->model('Model_emplacement');
+            $emplacements = $this->Model_emplacement->getEmplacementData();
+            $emp_exists = false;
+            foreach ($emplacements as $emp) {
+                if ($emp['codeemp'] == $this->input->post('add_emp')) {
+                    $emp_exists = true;
+                    break;
+                }
+            }
+            
+            if (!$article_exists) {
+                $response['success'] = false;
+                $response['messages'] = 'Article code does not exist in stock table';
+                echo json_encode($response);
+                return;
+            }
+            
+            if (!$emp_exists) {
+                $response['success'] = false;
+                $response['messages'] = 'Emplacement code does not exist';
+                echo json_encode($response);
+                return;
+            }
+            
             $data = array(
                 'code_article' => $this->input->post('add_codeart'),
                 'desc' => $this->input->post('add_desc'),
@@ -134,12 +195,48 @@ class Artstock extends Admin_Controller
         if ($id) {
             $this->form_validation->set_rules('edit_codeart', 'Code Art', 'trim|required'); // Update field name
 			$this->form_validation->set_rules('edit_desc', 'Description', 'trim|required'); // Update field name
-            $this->form_validation->set_rules('edit_qte', 'Quantity', 'trim|required'); // Update field name
-            $this->form_validation->set_rules('edit_emp', 'Employee', 'trim|required'); 
+            $this->form_validation->set_rules('edit_qte', 'Quantity', 'trim|required|numeric'); // Update field name
+            $this->form_validation->set_rules('edit_emp', 'Emplacement', 'trim|required'); 
 
             $this->form_validation->set_error_delimiters('<p class="text-danger">', '</p>');
 
             if ($this->form_validation->run() == TRUE) {
+                // Validate that article code exists in stock table
+                $this->load->model('Model_stock');
+                $article = $this->Model_stock->getStockData();
+                $article_exists = false;
+                foreach ($article as $art) {
+                    if ($art['codeart'] == $this->input->post('edit_codeart')) {
+                        $article_exists = true;
+                        break;
+                    }
+                }
+                
+                // Validate that emplacement code exists
+                $this->load->model('Model_emplacement');
+                $emplacements = $this->Model_emplacement->getEmplacementData();
+                $emp_exists = false;
+                foreach ($emplacements as $emp) {
+                    if ($emp['codeemp'] == $this->input->post('edit_emp')) {
+                        $emp_exists = true;
+                        break;
+                    }
+                }
+                
+                if (!$article_exists) {
+                    $response['success'] = false;
+                    $response['messages'] = 'Article code does not exist in stock table';
+                    echo json_encode($response);
+                    return;
+                }
+                
+                if (!$emp_exists) {
+                    $response['success'] = false;
+                    $response['messages'] = 'Emplacement code does not exist';
+                    echo json_encode($response);
+                    return;
+                }
+                
                 $data = array(
                     'code_article' => $this->input->post('edit_codeart'),
                     'desc' => $this->input->post('edit_desc'),
@@ -175,11 +272,11 @@ class Artstock extends Admin_Controller
             redirect('dashboard', 'refresh');
         }
 
-        $codeart = $this->input->post('code_article'); // Update input name
+        $id = $this->input->post('id'); // Fixed: Use id instead of code_article
 
         $response = array();
-        if ($codeart) {
-            $delete = $this->model_artstock->remove($codeart);
+        if ($id) {
+            $delete = $this->model_artstock->remove($id);
             if ($delete == true) {
                 $response['success'] = true;
                 $response['messages'] = "Successfully removed";

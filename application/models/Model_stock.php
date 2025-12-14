@@ -39,6 +39,14 @@ class Model_stock extends CI_Model
 	public function remove($id)
 {
     if($id) {
+        // Check if stock article has artstock records before deletion
+        $this->db->where('code_article', $this->getStockData($id)['codeart']);
+        $artstock_count = $this->db->count_all_results('artstock');
+        
+        if ($artstock_count > 0) {
+            return false; // Cannot delete - has artstock records
+        }
+        
         $this->db->where('id', $id);
         $delete = $this->db->delete('stock');
         return ($delete == true) ? true : false;

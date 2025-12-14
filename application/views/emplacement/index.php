@@ -215,6 +215,8 @@
       <form role="form" action="<?php echo base_url('emplacement/remove') ?>" method="post" id="removeForm">
         <div class="modal-body">
           <p>Do you really want to remove?</p>
+          <!-- Hidden input field to hold the emplacement ID -->
+          <input type="hidden" name="id" id="emplacement_id">
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -381,7 +383,8 @@ function editFunc(id)
 function removeFunc(id)
 {
   if(id) {
-    $("#removeForm").on('submit', function() {
+    $("#emplacement_id").val(id); // Set the hidden input value
+    $("#removeForm").unbind('submit').on('submit', function() {
 
       var form = $(this);
 
@@ -391,7 +394,7 @@ function removeFunc(id)
       $.ajax({
         url: form.attr('action'),
         type: form.attr('method'),
-        data: { codeemp:id }, 
+        data: form.serialize(), // Use form.serialize() to get the hidden input
         dataType: 'json',
         success:function(response) {
 

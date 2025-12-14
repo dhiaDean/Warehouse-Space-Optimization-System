@@ -201,17 +201,27 @@ public function remove()
         redirect('dashboard', 'refresh');
     }
 
-    $emplacement_id = $this->input->post('codeemp');
+    $id = $this->input->post('id'); // Fixed: Use id instead of codeemp
 
     $response = array();
-    if ($emplacement_id) {
-        $delete = $this->Model_emplacement->remove($emplacement_id);
-        if ($delete == true) {
-            $response['success'] = true;
-            $response['messages'] = "Successfully removed";
-        } else {
+    if ($id) {
+        // Check if emplacement has artstock records before deletion
+        $this->load->model('model_artstock');
+        $this->db->where('emp', $this->Model_emplacement->getEmplacementData($id)['codeemp']);
+        $artstock_count = $this->db->count_all_results('artstock');
+        
+        if ($artstock_count > 0) {
             $response['success'] = false;
-            $response['messages'] = "Error in the database while removing the emplacement information";
+            $response['messages'] = "Cannot delete emplacement. It has " . $artstock_count . " stock record(s) associated with it.";
+        } else {
+            $delete = $this->Model_emplacement->remove($id);
+            if ($delete == true) {
+                $response['success'] = true;
+                $response['messages'] = "Successfully removed";
+            } else {
+                $response['success'] = false;
+                $response['messages'] = "Error in the database while removing the emplacement information";
+            }
         }
     } else {
         $response['success'] = false;

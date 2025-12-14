@@ -13,12 +13,20 @@ class Model_artstock extends CI_Model
     public function getArtstockData($id = null)
     {
         if ($id) {
-            $sql = "SELECT * FROM artstock where id = ?";
+            $sql = "SELECT a.*, s.libart as article_name, e.libemp as emplacement_name 
+                    FROM artstock a
+                    LEFT JOIN stock s ON a.code_article = s.codeart
+                    LEFT JOIN emplacement e ON a.emp = e.codeemp
+                    WHERE a.id = ?";
             $query = $this->db->query($sql, array($id));
             return $query->row_array();
         }
 
-        $sql = "SELECT * FROM artstock";
+        $sql = "SELECT a.*, s.libart as article_name, e.libemp as emplacement_name 
+                FROM artstock a
+                LEFT JOIN stock s ON a.code_article = s.codeart
+                LEFT JOIN emplacement e ON a.emp = e.codeemp
+                ORDER BY a.id DESC";
         $query = $this->db->query($sql);
         return $query->result_array();
     }

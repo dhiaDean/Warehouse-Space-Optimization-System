@@ -45,7 +45,7 @@
               <thead>
                 <tr>
                   <th>code art</th>
-                  <th>libelle emp</th>
+                  <th>libelle art</th>
                   <th>prix</th>
                   <th>largeur</th>
                   <th>hauteur</th>
@@ -157,8 +157,8 @@
             <input type="text" class="form-control" id="edit_prix" name="edit_prix" placeholder="Enter Prix" autocomplete="off">
           </div>
           <div class="form-group">
-            <label for="edit_longeur">Longeur</label>
-            <input type="text" class="form-control" id="edit_longeur" name="edit_longeur" placeholder="Enter Longeur" autocomplete="off">
+            <label for="edit_langeur">Langeur</label>
+            <input type="text" class="form-control" id="edit_langeur" name="edit_langeur" placeholder="Enter Langeur" autocomplete="off">
           </div>
           <div class="form-group">
             <label for="edit_largeur">Largeur</label>

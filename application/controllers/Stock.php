@@ -185,13 +185,29 @@ public function remove()
 
     $response = array();
     if ($stock_id) {
-        $delete = $this->Model_stock->remove($stock_id); // Update model name to match class name
-        if ($delete == true) {
-            $response['success'] = true;
-            $response['messages'] = "Successfully removed";
+        // Check if article has artstock records
+        $stock_data = $this->Model_stock->getStockData($stock_id);
+        if ($stock_data) {
+            $this->load->model('model_artstock');
+            $this->db->where('code_article', $stock_data['codeart']);
+            $artstock_count = $this->db->count_all_results('artstock');
+            
+            if ($artstock_count > 0) {
+                $response['success'] = false;
+                $response['messages'] = "Cannot delete article. It has " . $artstock_count . " stock record(s) associated with it.";
+            } else {
+                $delete = $this->Model_stock->remove($stock_id); // Update model name to match class name
+                if ($delete == true) {
+                    $response['success'] = true;
+                    $response['messages'] = "Successfully removed";
+                } else {
+                    $response['success'] = false;
+                    $response['messages'] = "Error in the database while removing the article information";
+                }
+            }
         } else {
             $response['success'] = false;
-            $response['messages'] = "Error in the database while removing the article information";
+            $response['messages'] = "Article not found";
         }
     } else {
         $response['success'] = false;

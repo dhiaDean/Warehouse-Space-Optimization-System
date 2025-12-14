@@ -88,8 +88,14 @@
 
         <div class="form-group">
             <label for="add_codeart">code art</label>
-            <input type="text" class="form-control" id="add_codeart" name="add_codeart" placeholder="Enter code art" autocomplete="off">
-
+            <select class="form-control" id="add_codeart" name="add_codeart" required>
+              <option value="">Select Article</option>
+              <?php if(isset($stock_articles) && !empty($stock_articles)): ?>
+                <?php foreach($stock_articles as $article): ?>
+                  <option value="<?php echo $article['codeart']; ?>"><?php echo $article['codeart'] . ' - ' . $article['libart']; ?></option>
+                <?php endforeach; ?>
+              <?php endif; ?>
+            </select>
           </div>
           <div class="form-group">
             <label for="add_desc">description</label>
@@ -97,11 +103,18 @@
           </div>
           <div class="form-group">
             <label for="add_qte">qte</label>
-            <input type="text" class="form-control" id="add_qte" name="add_qte" placeholder="qte" autocomplete="off">
+            <input type="number" class="form-control" id="add_qte" name="add_qte" placeholder="qte" autocomplete="off" min="1" step="1">
           </div>
           <div class="form-group">
             <label for="add_emp">emp</label>
-            <input type="text" class="form-control" id="add_emp" name="add_emp" placeholder="emp" autocomplete="off">
+            <select class="form-control" id="add_emp" name="add_emp" required>
+              <option value="">Select Emplacement</option>
+              <?php if(isset($emplacements) && !empty($emplacements)): ?>
+                <?php foreach($emplacements as $emp): ?>
+                  <option value="<?php echo $emp['codeemp']; ?>"><?php echo $emp['codeemp'] . ' - ' . $emp['libemp']; ?></option>
+                <?php endforeach; ?>
+              <?php endif; ?>
+            </select>
           </div>
         </div>
 
@@ -135,8 +148,14 @@
 
           <div class="form-group">
             <label for="edit_codeart">code art</label>
-            <input type="text" class="form-control" id="edit_codeart" name="edit_codeart" placeholder="Enter code art" autocomplete="off">
-
+            <select class="form-control" id="edit_codeart" name="edit_codeart" required>
+              <option value="">Select Article</option>
+              <?php if(isset($stock_articles) && !empty($stock_articles)): ?>
+                <?php foreach($stock_articles as $article): ?>
+                  <option value="<?php echo $article['codeart']; ?>"><?php echo $article['codeart'] . ' - ' . $article['libart']; ?></option>
+                <?php endforeach; ?>
+              <?php endif; ?>
+            </select>
           </div>
           <div class="form-group">
             <label for="edit_desc">description</label>
@@ -144,11 +163,18 @@
          </div>
          <div class="form-group">
             <label for="edit_qte">qte</label>
-            <input type="text" class="form-control" id="edit_qte" name="edit_qte" placeholder="qte" autocomplete="off">
+            <input type="number" class="form-control" id="edit_qte" name="edit_qte" placeholder="qte" autocomplete="off" min="1" step="1">
           </div>
           <div class="form-group">
               <label for="edit_emp">emp</label>
-              <input type="text" class="form-control" id="edit_emp" name="edit_emp" placeholder="code emplacement" autocomplete="off">
+              <select class="form-control" id="edit_emp" name="edit_emp" required>
+                <option value="">Select Emplacement</option>
+                <?php if(isset($emplacements) && !empty($emplacements)): ?>
+                  <?php foreach($emplacements as $emp): ?>
+                    <option value="<?php echo $emp['codeemp']; ?>"><?php echo $emp['codeemp'] . ' - ' . $emp['libemp']; ?></option>
+                  <?php endforeach; ?>
+                <?php endif; ?>
+              </select>
           </div>
 
         <div class="modal-footer">
@@ -177,8 +203,8 @@
       <form role="form" action="<?php echo base_url('artstock/remove'); ?>" method="post" id="removeForm">
         <div class="modal-body">
           <p>Do you really want to remove this item?</p>
-          <!-- Hidden input field to hold the article ID -->
-          <input type="hidden" name="code_article" id="code_article">
+          <!-- Hidden input field to hold the artstock ID -->
+          <input type="hidden" name="id" id="artstock_id">
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -343,7 +369,8 @@ function removeFunc(id)
 {
   console.log('Remove button clicked with ID:', id);
   if(id) {
-    $("#removeForm").on('submit', function() {
+    $("#artstock_id").val(id); // Set the hidden input value
+    $("#removeForm").unbind('submit').on('submit', function() {
 
       var form = $(this);
 
@@ -353,7 +380,7 @@ function removeFunc(id)
       $.ajax({
         url: form.attr('action'),
         type: form.attr('method'),
-        data: {id:id }, 
+        data: form.serialize(), // Use form.serialize() to get the hidden input
         dataType: 'json',
         success:function(response) {
 
