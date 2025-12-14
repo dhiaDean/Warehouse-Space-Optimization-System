@@ -74,13 +74,17 @@ This system provides warehouse managers with tools to:
      ```
 
 3. **Import database schema**
-   - Create the necessary tables for:
+   - Import the database schema:
+     ```bash
+     mysql -u your_username -p your_database < database/schema.sql
+     ```
+   - Or manually execute the SQL file in your database management tool
+   - The schema includes tables for:
      - `stock` (articles)
      - `artstock` (article stock tracking)
      - `emplacement` (storage locations)
      - `users` (user accounts)
      - `groups` (user groups/permissions)
-   - Refer to your database migration files or schema documentation
 
 4. **Configure base URL**
    - Update `application/config/config.php` with your base URL:
@@ -132,7 +136,7 @@ _Add screenshots of your application here_
 
 ## 📄 License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Credits & Attribution
 

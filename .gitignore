@@ -7,6 +7,16 @@ application/cache/*
 # Database Configuration (contains sensitive credentials)
 application/config/database.php
 
+# Database dumps with data (DO NOT commit)
+*.sql.dump
+*.sql.backup
+*_dump.sql
+*_backup.sql
+*_data.sql
+# Allow schema files (structure only, no data)
+!database/schema.sql
+!database/migrations/*.sql
+
 # Environment Configuration
 .env
 .env.local

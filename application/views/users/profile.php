@@ -22,7 +22,7 @@
 
           <div class="box">
             <div class="box-header">
-              <h3 class="box-title">Profile XXX</h3>
+              <h3 class="box-title">Profile</h3>
             </div>
             <!-- /.box-header -->
             <div class="box-body">
