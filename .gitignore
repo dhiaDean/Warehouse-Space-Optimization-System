@@ -1,0 +1,76 @@
+# CodeIgniter
+application/logs/*
+!application/logs/index.html
+application/cache/*
+!application/cache/index.html
+
+# Database Configuration (contains sensitive credentials)
+application/config/database.php
+
+# Environment Configuration
+.env
+.env.local
+.env.*.local
+
+# Composer
+/vendor/
+composer.lock
+
+# IDE & Editor Files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-*
+
+# OS Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# User Uploads (product images)
+assets/images/product_image/*
+!assets/images/product_image/index.html
+
+# Temporary Files
+*.log
+*.tmp
+*.temp
+*.cache
+*.bak
+*.backup
+
+# Node modules (if using npm/bower)
+node_modules/
+bower_components/
+
+# Build files
+dist/
+build/
+
+# PHP
+*.php~
+*.phps
+
+# Testing
+phpunit.xml
+.phpunit.result.cache
+coverage/
+
+# Miscellaneous
+*.zip
+*.tar
+*.tar.gz
+*.rar
